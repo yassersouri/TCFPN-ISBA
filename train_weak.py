@@ -9,12 +9,14 @@ import os
 import time
 import numpy as np
 from scipy import io as sio
-from keras.utils import np_utils
 from itertools import groupby
 import cv2
 from cv2 import resize
+import tensorflow as tf
 
-from utils import utils, metrics, tf_models, weak_model
+
+import click
+import random
 
 # ---------- Directories & User inputs --------------
 # Location of data/features folder
@@ -24,16 +26,35 @@ data_dir = './data'  # make sure there are ./data/breakfast_data/s1/... and ./da
 n_nodes = [48, 64, 96]
 nb_epoch = 100
 conv_len = 25
-splits = ['s1', 's2', 's3', 's4']
+splits = ['s1']
 sample_rate = 15
-model_types = ['ED-TCN', 'TC-FPN']
-save_predictions = True
+model_types = ['TC-FPN']
+save_predictions = False
 batch_size = 8
 
 # ------------------------------------------------------------------
 # Evaluate using different filter lengths
-if 1:
+# if 1:
+
+
+@click.command()
+@click.argument('data-root', type=str)
+@click.option('--seed', type=int, default=0)
+def main(data_root, seed):
     # Load all the data, takes up to 3 min
+
+    random.seed(seed)
+    np.random.seed(seed)
+
+    # This is keras's fault! I have to set numpy random seed before importing keras!
+    # https://keras.io/getting-started/faq/#how-can-i-obtain-reproducible-results-using-keras-during-development
+    from keras.utils import np_utils
+    from utils import utils, metrics, tf_models, weak_model
+
+    tf.set_random_seed(seed)
+
+    data_dir = data_root
+
     breakfast_data = utils.breakfast_dataset(data_dir)
     print
     asct = time.asctime()
@@ -284,3 +305,7 @@ if 1:
         trial_metrics_final.print_trials()
         trial_metrics_final.print_scores()
         print
+
+
+if __name__ == '__main__':
+    main()
