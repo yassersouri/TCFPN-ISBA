@@ -106,7 +106,7 @@ def main(data_root, seed):
             trial_metrics.add_predictions('train_remap', y_train_temp, y_train_real)
             trial_metrics.print_trials()
 
-            n_feat = 64
+            n_feat = 2048
             # print "# Feat:", n_feat
 
             # ------------------ Models ----------------------------

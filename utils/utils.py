@@ -174,7 +174,7 @@ class breakfast_dataset():
         all = ["P%02d" % i for i in range(3, 56)]
         splits = [all[:13], all[13:26], all[26:39], all[39:52]]
 
-        features = glob.glob(os.path.join(dir, 'breakfast_data', 's1', '*', '*.txt'))
+        features = glob.glob(os.path.join(dir, 'breakfast_data', 's1', '*', '*.npy'))
         labels = glob.glob(os.path.join(dir, 'segmentation_coarse', '*', '*.txt'))
         features.sort()
         labels.sort()
@@ -183,7 +183,7 @@ class breakfast_dataset():
         actions = []
 
         for f, l in tqdm(zip(features, labels)):
-            _x = np.loadtxt(f)
+            _x = np.load(f)
             _y_raw = open(l).readlines()
             _y = np.repeat(0, int(_y_raw[-1].split()[0].split('-')[1]))
             for act in _y_raw:
@@ -195,7 +195,7 @@ class breakfast_dataset():
 
             for i in range(4):
                 if sum([k in f for k in splits[i]]) > 0:  # in the split
-                    self.data[2 * i].append(_x[5:n, 1:])  # exclude index and first 5 frames (all-zero feature)
+                    self.data[2 * i].append(_x[5:n])
                     self.data[2 * i + 1].append(_y[5:n])
                     break
 
