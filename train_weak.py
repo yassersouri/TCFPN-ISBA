@@ -51,7 +51,7 @@ def main(data_root, seed):
     from keras.utils import np_utils
     from utils import utils, metrics, tf_models, weak_model
 
-    tf.set_random_seed(seed)
+    tf.compat.v1.set_random_seed(seed)
 
     data_dir = data_root
 
