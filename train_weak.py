@@ -12,7 +12,8 @@ from scipy import io as sio
 from itertools import groupby
 import cv2
 from cv2 import resize
-import tensorflow as tf
+from utils import utils, metrics, tf_models, weak_model
+from keras.utils import np_utils
 
 
 import click
@@ -26,7 +27,7 @@ data_dir = './data'  # make sure there are ./data/breakfast_data/s1/... and ./da
 n_nodes = [48, 64, 96]
 nb_epoch = 100
 conv_len = 25
-splits = ['s1']
+splits = ['s9']
 sample_rate = 15
 model_types = ['TC-FPN']
 save_predictions = False
@@ -42,17 +43,6 @@ batch_size = 8
 @click.option('--seed', type=int, default=0)
 def main(data_root, seed):
     # Load all the data, takes up to 3 min
-
-    random.seed(seed)
-    np.random.seed(seed)
-
-    # This is keras's fault! I have to set numpy random seed before importing keras!
-    # https://keras.io/getting-started/faq/#how-can-i-obtain-reproducible-results-using-keras-during-development
-    from keras.utils import np_utils
-    from utils import utils, metrics, tf_models, weak_model
-
-    tf.compat.v1.set_random_seed(seed)
-
     data_dir = data_root
 
     breakfast_data = utils.breakfast_dataset(data_dir)

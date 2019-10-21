@@ -180,6 +180,18 @@ class breakfast_dataset():
         labels.sort()
 
         self.data = [[] for i in range(8)]  # x,y for 4 splits
+
+        self.split9_train_x = []
+        self.split9_train_y = []
+        self.split9_test_x = []
+        self.split9_test_y = []
+
+        with open(os.path.join(dir, 'split9.train')) as f:
+            train_lines = [x.strip() for x in f.readlines()]
+
+        with open(os.path.join(dir, 'split9.test')) as f:
+            test_lines = [x.strip() for x in f.readlines()]
+
         actions = []
 
         for f, l in tqdm(zip(features, labels)):
@@ -193,6 +205,16 @@ class breakfast_dataset():
                 _y[(int(tm.split('-')[0]) - 1):int(tm.split('-')[1])] = actions.index(lb)
             n = min(len(_x), len(_y))  # make sure the same length
 
+            fn = f.split(os.sep)[-1][:-4]
+            if fn in train_lines:
+                self.split9_train_x.append(_x[5:n, 1:])
+                self.split9_train_y.append(_y[5:n])
+            elif fn in test_lines:
+                self.split9_test_x.append(_x[5:n, 1:])
+                self.split9_test_y.append(_y[5:n])
+            else:
+                print('JIIIIIIIIIIIIIIIIIIIIIIIG!!!!')
+
             for i in range(4):
                 if sum([k in f for k in splits[i]]) > 0:  # in the split
                     self.data[2 * i].append(_x[5:n, 1:])  # exclude index and first 5 frames (all-zero feature)
@@ -200,7 +222,14 @@ class breakfast_dataset():
                     break
 
     def get_split(self, split, type):
-        if split not in ['s1', 's2', 's3', 's4']:
+        if split == "s9":
+            if type == "train":
+                return self.split9_train_x, self.split9_train_y
+            elif type == "test":
+                return self.split9_test_x, self.split9_test_y
+            else:
+                print "please enter type from ['train','test']"
+        elif split not in ['s1', 's2', 's3', 's4']:
             print "please enter split index from ['s1','s2','s3','s4']"
         else:
             split = int(split[1]) - 1
